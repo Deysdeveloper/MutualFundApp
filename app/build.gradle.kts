@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.android)
@@ -56,16 +55,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     // Compose
     implementation ("androidx.compose.ui:ui:1.6.0")
+    implementation("androidx.compose.material:material-icons-extended")
 
-    // Navigation 3
-    implementation("androidx.navigation3:navigation3-runtime:1.1.0")
-    implementation("androidx.navigation3:navigation3-ui:1.1.0")
+    // Navigation Compose (compatible with AGP 8.7.3)
+    implementation("androidx.navigation:navigation-compose:2.8.9")
 
     // Hilt + Navigation integration
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-    // Serialization (required for Nav3 route keys)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Coroutines core (Flow operators: debounce, distinctUntilChanged)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
