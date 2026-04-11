@@ -44,5 +44,5 @@ class WatchlistRepository(
      * Check whether a fund with [schemeCode] already exists in any folder.
      */
     suspend fun isFundSaved(schemeCode: String): Boolean =
-        watchlistDao.checkIfFundExists(schemeCode)
+        watchlistDao.getFundIdByScheme(schemeCode) != null
 }

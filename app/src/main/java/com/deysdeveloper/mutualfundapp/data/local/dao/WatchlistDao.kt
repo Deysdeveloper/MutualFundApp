@@ -27,14 +27,6 @@ interface WatchlistDao {
     @Query("SELECT * FROM watchlist_funds WHERE folderId = :folderId")
     fun getFundsByFolder(folderId: Long): Flow<List<WatchlistFund>>
 
-    @Query(
-        """
-        SELECT EXISTS(
-            SELECT 1 FROM watchlist_funds 
-            WHERE schemeCode = :schemeCode 
-            LIMIT 1
-        )
-        """
-    )
-    suspend fun checkIfFundExists(schemeCode: String): Boolean
+    @Query("SELECT id FROM watchlist_funds WHERE schemeCode = :schemeCode LIMIT 1")
+    suspend fun getFundIdByScheme(schemeCode: String): Long?
 }
