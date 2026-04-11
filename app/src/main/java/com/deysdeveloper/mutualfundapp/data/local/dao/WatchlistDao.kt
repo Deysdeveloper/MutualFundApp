@@ -29,4 +29,19 @@ interface WatchlistDao {
 
     @Query("SELECT id FROM watchlist_funds WHERE schemeCode = :schemeCode LIMIT 1")
     suspend fun getFundIdByScheme(schemeCode: String): Long?
+
+    // ─── Delete operations ─────────────────────────────────────────────────
+
+    /**
+     * Deletes the folder. Cascade rule on [WatchlistFund] removes all its funds automatically.
+     * Returns Int (not Unit) to avoid the Room + KSP `room.generateKotlin` void-signature bug.
+     */
+    @Query("DELETE FROM watchlist_folders WHERE id = :folderId")
+    suspend fun deleteFolder(folderId: Long): Int
+
+    /**
+     * Removes a single fund entry from a folder by its primary key.
+     */
+    @Query("DELETE FROM watchlist_funds WHERE id = :fundId")
+    suspend fun deleteFund(fundId: Long): Int
 }

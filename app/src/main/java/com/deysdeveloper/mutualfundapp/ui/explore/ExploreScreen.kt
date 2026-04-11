@@ -66,6 +66,7 @@ private val categoryGradients = listOf(
 fun ExploreScreen(
     onNavigateToProduct: (String) -> Unit,
     onNavigateToSearch: () -> Unit,
+    onNavigateToCategory: (label: String, query: String) -> Unit = { _, _ -> },
     viewModel: ExploreViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -85,7 +86,8 @@ fun ExploreScreen(
             )
             is ExploreUiState.Success -> ExploreContent(
                 categories = state.categories,
-                onFundClick = onNavigateToProduct
+                onFundClick = onNavigateToProduct,
+                onSeeAllClick = onNavigateToCategory
             )
         }
     }
@@ -157,15 +159,18 @@ private fun ExploreHeader(onSearchClick: () -> Unit) {
 @Composable
 private fun ExploreContent(
     categories: Map<String, List<Fund>>,
-    onFundClick: (String) -> Unit
+    onFundClick: (String) -> Unit,
+    onSeeAllClick: (label: String, query: String) -> Unit
 ) {
     LazyColumn(contentPadding = PaddingValues(bottom = 32.dp)) {
         categories.entries.forEachIndexed { index, (categoryName, funds) ->
             item(key = categoryName) {
+                val query = EXPLORE_CATEGORIES[categoryName] ?: categoryName
                 CategorySection(
                     title = categoryName,
                     funds = funds.take(MAX_CARDS_PER_CATEGORY),
                     onFundClick = onFundClick,
+                    onSeeAllClick = { onSeeAllClick(categoryName, query) },
                     colorIndex = index % categoryGradients.size
                 )
             }
@@ -180,6 +185,7 @@ private fun CategorySection(
     title: String,
     funds: List<Fund>,
     onFundClick: (String) -> Unit,
+    onSeeAllClick: () -> Unit,
     colorIndex: Int
 ) {
     val gradient = categoryGradients[colorIndex]
@@ -213,7 +219,7 @@ private fun CategorySection(
                 style = MaterialTheme.typography.labelMedium,
                 color = gradient[0],
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.clickable { /* future: navigate to category list */ }
+                modifier = Modifier.clickable(onClick = onSeeAllClick)
             )
         }
 

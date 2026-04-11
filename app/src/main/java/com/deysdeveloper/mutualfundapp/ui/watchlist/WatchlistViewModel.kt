@@ -6,21 +6,11 @@ import com.deysdeveloper.mutualfundapp.data.local.entity.WatchlistFolder
 import com.deysdeveloper.mutualfundapp.data.local.entity.WatchlistFund
 import com.deysdeveloper.mutualfundapp.data.repository.WatchlistRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-// ─── UI State ─────────────────────────────────────────────────────────────────
-
-sealed class WatchlistUiState {
-    data object Loading : WatchlistUiState()
-    data class Success(val folders: List<WatchlistFolder>) : WatchlistUiState()
-    // No error needed for local DB; an empty list is a valid state
-}
 
 // ─── ViewModel ────────────────────────────────────────────────────────────────
 
@@ -64,6 +54,24 @@ class WatchlistViewModel @Inject constructor(
             folderIds.forEach { folderId ->
                 watchlistRepository.addFundToFolder(schemeCode, folderId)
             }
+        }
+    }
+
+    /**
+     * Deletes a watchlist folder and all its funds (cascade handled by Room FK).
+     */
+    fun deleteFolder(folderId: Long) {
+        viewModelScope.launch {
+            watchlistRepository.deleteFolder(folderId)
+        }
+    }
+
+    /**
+     * Removes a single fund entry from a folder.
+     */
+    fun deleteFund(fundId: Long) {
+        viewModelScope.launch {
+            watchlistRepository.deleteFund(fundId)
         }
     }
 }

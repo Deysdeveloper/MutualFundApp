@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bookmarks
 import androidx.compose.material.icons.rounded.Explore
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -25,13 +24,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.deysdeveloper.mutualfundapp.ui.explore.CategoryListScreen
 import com.deysdeveloper.mutualfundapp.ui.explore.ExploreScreen
 import com.deysdeveloper.mutualfundapp.ui.product.ProductScreen
 import com.deysdeveloper.mutualfundapp.ui.search.SearchScreen
 import com.deysdeveloper.mutualfundapp.ui.watchlist.FolderDetailScreen
 import com.deysdeveloper.mutualfundapp.ui.watchlist.WatchlistScreen
 
-// ─── Bottom nav items ─────────────────────────────────────────────────────────
+// ─── Bottom nav items (2 tabs — Explore + Portfolios) ─────────────────────────
 
 private data class NavItem(
     val route: Route,
@@ -40,9 +40,8 @@ private data class NavItem(
 )
 
 private val navItems = listOf(
-    NavItem(Route.Explore,   "Explore",   Icons.Rounded.Explore),
-    NavItem(Route.Search,    "Search",    Icons.Rounded.Search),
-    NavItem(Route.Watchlist, "Watchlist", Icons.Rounded.Bookmarks),
+    NavItem(Route.Explore,   "Explore",    Icons.Rounded.Explore),
+    NavItem(Route.Watchlist, "Portfolios", Icons.Rounded.Bookmarks),
 )
 
 // ─── Navigation host ──────────────────────────────────────────────────────────
@@ -55,7 +54,7 @@ fun AppNavigation() {
     val selectedRootRoute by remember {
         derivedStateOf {
             backStack.filterIsInstance<Route>()
-                .lastOrNull { it is Route.Explore || it is Route.Search || it is Route.Watchlist }
+                .lastOrNull { it is Route.Explore || it is Route.Watchlist }
                 ?: Route.Explore
         }
     }
@@ -71,7 +70,7 @@ fun AppNavigation() {
                         selected = selectedRootRoute == item.route,
                         onClick = {
                             if (selectedRootRoute == item.route) {
-                                // Same tab tapped – pop to root in a single state mutation
+                                // Same tab tapped – pop to root
                                 if (backStack.size > 1) {
                                     backStack.subList(1, backStack.size).clear()
                                 }
@@ -117,6 +116,9 @@ fun AppNavigation() {
                             },
                             onNavigateToSearch = {
                                 backStack.add(Route.Search)
+                            },
+                            onNavigateToCategory = { label, query ->
+                                backStack.add(Route.CategoryList(label, query))
                             }
                         )
                     }
@@ -127,6 +129,17 @@ fun AppNavigation() {
                                 backStack.add(Route.Product(schemeCode))
                             },
                             onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+
+                    entry<Route.CategoryList> { key ->
+                        CategoryListScreen(
+                            categoryLabel = key.categoryLabel,
+                            query = key.query,
+                            onBack = { backStack.removeLastOrNull() },
+                            onNavigateToProduct = { schemeCode ->
+                                backStack.add(Route.Product(schemeCode))
+                            }
                         )
                     }
 
@@ -152,6 +165,10 @@ fun AppNavigation() {
                             onBack = { backStack.removeLastOrNull() },
                             onNavigateToProduct = { schemeCode ->
                                 backStack.add(Route.Product(schemeCode))
+                            },
+                            onNavigateToExplore = {
+                                backStack.clear()
+                                backStack.add(Route.Explore)
                             }
                         )
                     }

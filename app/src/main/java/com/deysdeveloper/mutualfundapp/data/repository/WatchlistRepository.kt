@@ -45,4 +45,20 @@ class WatchlistRepository(
      */
     suspend fun isFundSaved(schemeCode: String): Boolean =
         watchlistDao.getFundIdByScheme(schemeCode) != null
+
+    // ─── Delete operations ──────────────────────────────────────────────────
+
+    /**
+     * Delete a folder by [folderId]. All funds inside are removed via cascade.
+     */
+    suspend fun deleteFolder(folderId: Long) {
+        watchlistDao.deleteFolder(folderId)
+    }
+
+    /**
+     * Remove a single fund entry from a folder by its [fundId].
+     */
+    suspend fun deleteFund(fundId: Long) {
+        watchlistDao.deleteFund(fundId)
+    }
 }
