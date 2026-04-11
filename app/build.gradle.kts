@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -57,8 +58,12 @@ dependencies {
     implementation ("androidx.compose.ui:ui:1.6.0")
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Navigation Compose (compatible with AGP 8.7.3)
-    implementation("androidx.navigation:navigation-compose:2.8.9")
+    // Navigation 3
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
+
+    // Kotlinx Serialization (required for Nav3 typed routes)
+    implementation(libs.kotlinx.serialization.json)
 
     // Hilt + Navigation integration
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
@@ -72,8 +77,8 @@ dependencies {
     implementation ("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
 // Hilt (DI)
-    implementation ("com.google.dagger:hilt-android:2.51.1")
-    ksp ("com.google.dagger:hilt-compiler:2.51.1")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
 // Room (DB)
     implementation ("androidx.room:room-runtime:2.6.1")

@@ -4,79 +4,99 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.rounded.Bookmarks
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.deysdeveloper.mutualfundapp.ui.explore.ExploreScreen
 import com.deysdeveloper.mutualfundapp.ui.product.ProductScreen
 import com.deysdeveloper.mutualfundapp.ui.search.SearchScreen
 import com.deysdeveloper.mutualfundapp.ui.watchlist.FolderDetailScreen
 import com.deysdeveloper.mutualfundapp.ui.watchlist.WatchlistScreen
 
+// ─── Bottom nav items ─────────────────────────────────────────────────────────
+
+private data class NavItem(
+    val route: Route,
+    val label: String,
+    val icon: ImageVector
+)
+
+private val navItems = listOf(
+    NavItem(Route.Explore,   "Explore",   Icons.Rounded.Explore),
+    NavItem(Route.Search,    "Search",    Icons.Rounded.Search),
+    NavItem(Route.Watchlist, "Watchlist", Icons.Rounded.Bookmarks),
+)
+
+// ─── Navigation host ──────────────────────────────────────────────────────────
+
 @Composable
 fun AppNavigation() {
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val backStack = rememberNavBackStack(Route.Explore)
 
-    // Top-level tab routes shown in the bottom nav bar
-    val topLevelRoutes = listOf(Routes.EXPLORE, Routes.SEARCH, Routes.WATCHLIST)
+    // The "active" bottom-nav tab is the deepest tab-level route in the stack
+    val selectedRootRoute by remember {
+        derivedStateOf {
+            backStack.filterIsInstance<Route>()
+                .lastOrNull { it is Route.Explore || it is Route.Search || it is Route.Watchlist }
+                ?: Route.Explore
+        }
+    }
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = currentDestination?.hierarchy?.any { it.route == Routes.EXPLORE } == true,
-                    onClick = {
-                        navController.navigate(Routes.EXPLORE) {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Explore") },
-                    label = { Text("Explore") }
-                )
-                NavigationBarItem(
-                    selected = currentDestination?.hierarchy?.any { it.route == Routes.SEARCH } == true,
-                    onClick = {
-                        navController.navigate(Routes.SEARCH) {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                    label = { Text("Search") }
-                )
-                NavigationBarItem(
-                    selected = currentDestination?.hierarchy?.any { it.route == Routes.WATCHLIST } == true,
-                    onClick = {
-                        navController.navigate(Routes.WATCHLIST) {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    icon = { Icon(Icons.Default.Star, contentDescription = "Watchlist") },
-                    label = { Text("Watchlist") }
-                )
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 3.dp
+            ) {
+                navItems.forEach { item ->
+                    NavigationBarItem(
+                        selected = selectedRootRoute == item.route,
+                        onClick = {
+                            if (selectedRootRoute == item.route) {
+                                // Same tab tapped – pop to root in a single state mutation
+                                if (backStack.size > 1) {
+                                    backStack.subList(1, backStack.size).clear()
+                                }
+                            } else {
+                                // Different tab – clear stack and go to new root
+                                backStack.clear()
+                                backStack.add(item.route)
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = item.label
+                            )
+                        },
+                        label = { Text(item.label) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color(0xFF1E3A8A),
+                            selectedTextColor = Color(0xFF1E3A8A),
+                            indicatorColor = Color(0xFF1E3A8A).copy(alpha = 0.12f),
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -85,70 +105,58 @@ fun AppNavigation() {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            NavHost(
-                navController = navController,
-                startDestination = Routes.EXPLORE
-            ) {
-                composable(Routes.EXPLORE) {
-                    ExploreScreen(
-                        onNavigateToProduct = { schemeCode ->
-                            navController.navigate(Routes.product(schemeCode))
-                        },
-                        onNavigateToSearch = {
-                            navController.navigate(Routes.SEARCH)
-                        }
-                    )
-                }
+            NavDisplay(
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
+                entryProvider = entryProvider {
 
-                composable(Routes.SEARCH) {
-                    SearchScreen(
-                        onNavigateToProduct = { schemeCode ->
-                            navController.navigate(Routes.product(schemeCode))
-                        },
-                        onBack = { navController.popBackStack() }
-                    )
-                }
+                    entry<Route.Explore> {
+                        ExploreScreen(
+                            onNavigateToProduct = { schemeCode ->
+                                backStack.add(Route.Product(schemeCode))
+                            },
+                            onNavigateToSearch = {
+                                backStack.add(Route.Search)
+                            }
+                        )
+                    }
 
-                composable(Routes.WATCHLIST) {
-                    WatchlistScreen(
-                        onNavigateToFolder = { folderId, folderName ->
-                            navController.navigate(Routes.folder(folderId, folderName))
-                        }
-                    )
-                }
+                    entry<Route.Search> {
+                        SearchScreen(
+                            onNavigateToProduct = { schemeCode ->
+                                backStack.add(Route.Product(schemeCode))
+                            },
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
 
-                composable(
-                    route = Routes.PRODUCT,
-                    arguments = listOf(
-                        navArgument("schemeCode") { type = NavType.StringType }
-                    )
-                ) { backStackEntry ->
-                    val schemeCode = backStackEntry.arguments?.getString("schemeCode") ?: return@composable
-                    ProductScreen(
-                        schemeCode = schemeCode,
-                        onBack = { navController.popBackStack() }
-                    )
-                }
+                    entry<Route.Watchlist> {
+                        WatchlistScreen(
+                            onNavigateToFolder = { folderId, folderName ->
+                                backStack.add(Route.Folder(folderId, folderName))
+                            }
+                        )
+                    }
 
-                composable(
-                    route = Routes.FOLDER,
-                    arguments = listOf(
-                        navArgument("folderId") { type = NavType.LongType },
-                        navArgument("folderName") { type = NavType.StringType }
-                    )
-                ) { backStackEntry ->
-                    val folderId = backStackEntry.arguments?.getLong("folderId") ?: return@composable
-                    val folderName = backStackEntry.arguments?.getString("folderName") ?: ""
-                    FolderDetailScreen(
-                        folderId = folderId,
-                        folderName = folderName.replace("%2F", "/").replace("%20", " "),
-                        onBack = { navController.popBackStack() },
-                        onNavigateToProduct = { schemeCode ->
-                            navController.navigate(Routes.product(schemeCode))
-                        }
-                    )
+                    entry<Route.Product> { key ->
+                        ProductScreen(
+                            schemeCode = key.schemeCode,
+                            onBack = { backStack.removeLastOrNull() }
+                        )
+                    }
+
+                    entry<Route.Folder> { key ->
+                        FolderDetailScreen(
+                            folderId = key.folderId,
+                            folderName = key.folderName,
+                            onBack = { backStack.removeLastOrNull() },
+                            onNavigateToProduct = { schemeCode ->
+                                backStack.add(Route.Product(schemeCode))
+                            }
+                        )
+                    }
                 }
-            }
+            )
         }
     }
 }

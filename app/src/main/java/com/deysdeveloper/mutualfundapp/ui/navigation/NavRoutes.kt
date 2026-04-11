@@ -1,23 +1,27 @@
 package com.deysdeveloper.mutualfundapp.ui.navigation
 
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
+
 /**
- * Navigation route string constants for Navigation Compose.
+ * Type-safe navigation route keys for Navigation 3.
+ * Each subtype is @Serializable so Nav3 can save/restore the back stack.
  */
-object Routes {
-    const val EXPLORE = "explore"
-    const val SEARCH = "search"
-    const val WATCHLIST = "watchlist"
+@Serializable
+sealed interface Route : NavKey {
 
-    // Routes with arguments
-    const val PRODUCT = "product/{schemeCode}"
-    const val FOLDER = "folder/{folderId}/{folderName}"
+    @Serializable
+    data object Explore : Route
 
-    // Builders for navigating with arguments
-    fun product(schemeCode: String) = "product/$schemeCode"
-    fun folder(folderId: Long, folderName: String) =
-        "folder/$folderId/${folderName.encodeForRoute()}"
+    @Serializable
+    data object Search : Route
+
+    @Serializable
+    data object Watchlist : Route
+
+    @Serializable
+    data class Product(val schemeCode: String) : Route
+
+    @Serializable
+    data class Folder(val folderId: Long, val folderName: String) : Route
 }
-
-/** Percent-encodes slashes and spaces so folder names are safe in routes. */
-private fun String.encodeForRoute(): String =
-    this.replace("/", "%2F").replace(" ", "%20")

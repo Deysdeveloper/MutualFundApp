@@ -1,17 +1,17 @@
 [versions]
-agp = "8.7.3"
+agp = "9.1.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
-kotlin = "2.1.0"
+kotlin = "2.2.10"
 composeBom = "2024.12.01"
-ksp = "2.1.0-1.0.29"
-hilt = "2.52"
+ksp = "2.3.2"
+hilt = "2.56"
 room = "2.6.1"
-navigation3 = "1.0.0"
+navigation3 = "1.0.1"
 hiltNavigationCompose = "1.2.0"
 kotlinxSerializationJson = "1.6.3"
 kotlinxCoroutines = "1.7.3"
@@ -31,6 +31,11 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3" }
+navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "navigation3" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
