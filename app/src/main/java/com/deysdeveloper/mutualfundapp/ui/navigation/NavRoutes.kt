@@ -24,4 +24,7 @@ sealed interface Route : NavKey {
 
     @Serializable
     data class Folder(val folderId: Long, val folderName: String) : Route
+
+    @Serializable
+    data class CategoryList(val categoryLabel: String, val query: String) : Route
 }

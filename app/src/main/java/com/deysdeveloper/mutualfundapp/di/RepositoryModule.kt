@@ -1,6 +1,7 @@
 package com.deysdeveloper.mutualfundapp.di
 
 import com.deysdeveloper.mutualfundapp.data.api.MfApiService
+import com.deysdeveloper.mutualfundapp.data.local.dao.CachedFundDao
 import com.deysdeveloper.mutualfundapp.data.local.dao.WatchlistDao
 import com.deysdeveloper.mutualfundapp.data.repository.FundRepository
 import com.deysdeveloper.mutualfundapp.data.repository.WatchlistRepository
@@ -16,8 +17,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideFundRepository(apiService: MfApiService): FundRepository =
-        FundRepository(apiService)
+    fun provideFundRepository(
+        apiService: MfApiService,
+        cachedFundDao: CachedFundDao
+    ): FundRepository = FundRepository(apiService, cachedFundDao)
 
     @Provides
     @Singleton

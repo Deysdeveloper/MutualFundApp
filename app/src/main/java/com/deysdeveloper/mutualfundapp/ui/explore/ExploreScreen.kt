@@ -81,7 +81,7 @@ fun ExploreScreen(
             is ExploreUiState.Loading -> ExploreLoadingState()
             is ExploreUiState.Error   -> ExploreErrorState(
                 message = state.message,
-                onRetry = viewModel::fetchCategories
+                onRetry = viewModel::loadCategories
             )
             is ExploreUiState.Success -> ExploreContent(
                 categories = state.categories,
