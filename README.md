@@ -3,6 +3,7 @@
 An Android app for exploring, searching, and tracking mutual funds — built as an assignment for the **Groww Android Intern** role.
 
 ---
+Demo link : https://drive.google.com/file/d/1072qeq3mzehwXqPs1klQ0Gw_zpYImvgU/view?usp=sharing
 
 ## Features
 
