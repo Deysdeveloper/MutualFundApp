@@ -60,15 +60,11 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import kotlin.math.abs
 
-// ─── Time filter options ──────────────────────────────────────────────────────
-
 private enum class TimeFilter(val label: String, val days: Int) {
     SIX_MONTHS("6M", 182),
     ONE_YEAR("1Y", 365),
     ALL("ALL", Int.MAX_VALUE)
 }
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,7 +130,6 @@ fun ProductScreen(
         }
     }
 
-    // Watchlist bottom sheet
     if (showWatchlistSheet) {
         ModalBottomSheet(
             onDismissRequest = { showWatchlistSheet = false },
@@ -150,8 +145,6 @@ fun ProductScreen(
         }
     }
 }
-
-// ─── Content ──────────────────────────────────────────────────────────────────
 
 @Composable
 private fun ProductContent(
@@ -173,7 +166,6 @@ private fun ProductContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        // ── Fund name + category header ──────────────────────────────────────
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -202,7 +194,6 @@ private fun ProductContent(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            // NAV + change badge
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "NAV ₹$latestNav",
@@ -217,14 +208,12 @@ private fun ProductContent(
             }
         }
 
-        // ── Chart ────────────────────────────────────────────────────────────
         Spacer(modifier = Modifier.height(16.dp))
         NavLineChart(
             navData = filteredChartData,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
-        // ── Time filter tabs ─────────────────────────────────────────────────
         Spacer(modifier = Modifier.height(12.dp))
         TimeFilterRow(
             selected = selectedFilter,
@@ -236,7 +225,6 @@ private fun ProductContent(
         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Fund info rows ───────────────────────────────────────────────────
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             InfoRow(label = "AMC", value = fundDetails.meta.fundHouse)
             InfoRow(label = "Type", value = fundDetails.meta.schemeType)
@@ -247,7 +235,6 @@ private fun ProductContent(
         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Stats row ────────────────────────────────────────────────────────
         StatsRow(
             type = fundDetails.meta.schemeType.take(10),
             category = fundDetails.meta.schemeCategory.take(12),
@@ -258,8 +245,6 @@ private fun ProductContent(
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
-
-// ─── NAV change badge ─────────────────────────────────────────────────────────
 
 private data class NavChange(val percent: Float, val isPositive: Boolean)
 
@@ -304,8 +289,6 @@ private fun NavChangeBadge(navChange: NavChange) {
     }
 }
 
-// ─── Time filter row ──────────────────────────────────────────────────────────
-
 @Composable
 private fun TimeFilterRow(
     selected: TimeFilter,
@@ -348,8 +331,6 @@ private fun TimeFilterRow(
         }
     }
 }
-
-// ─── Stats row ────────────────────────────────────────────────────────────────
 
 @Composable
 private fun StatsRow(
@@ -398,8 +379,6 @@ private fun StatsDivider() {
     )
 }
 
-// ─── Info row ─────────────────────────────────────────────────────────────────
-
 @Composable
 private fun InfoRow(label: String, value: String) {
     Row(
@@ -422,8 +401,6 @@ private fun InfoRow(label: String, value: String) {
     }
 }
 
-// ─── Nav data sampling ────────────────────────────────────────────────────────
-
 private fun sampleNavData(rawData: List<NavEntry>, filter: TimeFilter): List<NavEntry> {
     val limited = if (filter.days == Int.MAX_VALUE) rawData else rawData.take(filter.days)
     // Downsample to avoid overloading the chart renderer
@@ -434,8 +411,6 @@ private fun sampleNavData(rawData: List<NavEntry>, filter: TimeFilter): List<Nav
     }
     return limited.filterIndexed { index, _ -> index % step == 0 }
 }
-
-// ─── MPAndroidChart Line Chart ────────────────────────────────────────────────
 
 @Composable
 private fun NavLineChart(
@@ -493,8 +468,6 @@ private fun NavLineChart(
         }
     )
 }
-
-// ─── Error State ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun ProductErrorState(

@@ -42,16 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.deysdeveloper.mutualfundapp.domain.model.Fund
 
-// ─── Accent colours — cycles across categories ────────────────────────────────
-
 private val accentColors = listOf(
     Color(0xFF1565C0),
     Color(0xFF2E7D32),
     Color(0xFF6A1B9A),
     Color(0xFFBF360C),
 )
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,8 +106,6 @@ fun CategoryListScreen(
     }
 }
 
-// ─── Fund list ────────────────────────────────────────────────────────────────
-
 @Composable
 private fun FundList(
     funds: List<Fund>,
@@ -146,7 +140,6 @@ private fun FundRow(
             modifier = Modifier.padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // AMC icon badge
             Box(
                 modifier = Modifier
                     .size(42.dp)
@@ -182,8 +175,6 @@ private fun FundRow(
         }
     }
 }
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun CategoryEmptyState(modifier: Modifier = Modifier) {

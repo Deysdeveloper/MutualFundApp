@@ -47,8 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.deysdeveloper.mutualfundapp.data.local.entity.WatchlistFund
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FolderDetailScreen(
@@ -99,8 +97,6 @@ fun FolderDetailScreen(
     }
 }
 
-// ─── Fund list ────────────────────────────────────────────────────────────────
-
 @Composable
 private fun FundList(
     funds: List<WatchlistFund>,
@@ -117,8 +113,6 @@ private fun FundList(
         }
     }
 }
-
-// ─── Swipe-to-delete wrapper ──────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,7 +131,7 @@ private fun SwipeToDeleteFundItem(
         positionalThreshold = { totalDistance -> totalDistance * 0.4f }
     )
 
-    // Reset state if fund is still in list (e.g., delete failed)
+    // Reset if delete failed and the item is still in the list
     LaunchedEffect(fund.id) {
         dismissState.reset()
     }
@@ -179,8 +173,6 @@ private fun SwipeToDeleteFundItem(
     }
 }
 
-// ─── Fund item ────────────────────────────────────────────────────────────────
-
 @Composable
 private fun FundItem(fund: WatchlistFund, onClick: () -> Unit) {
     Card(
@@ -205,8 +197,6 @@ private fun FundItem(fund: WatchlistFund, onClick: () -> Unit) {
         }
     }
 }
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun FolderEmptyState(

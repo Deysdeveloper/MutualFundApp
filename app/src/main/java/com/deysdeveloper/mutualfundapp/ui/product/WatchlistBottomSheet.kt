@@ -49,7 +49,6 @@ fun WatchlistBottomSheet(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        // Title
         Text(
             text = "Add to Watchlist",
             style = MaterialTheme.typography.titleLarge,
@@ -57,7 +56,6 @@ fun WatchlistBottomSheet(
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        // Folder list with checkboxes
         if (folders.isEmpty()) {
             Text(
                 text = "No folders yet. Create one below.",
@@ -94,7 +92,6 @@ fun WatchlistBottomSheet(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // New folder creation
         if (showNewFolderField) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -134,7 +131,6 @@ fun WatchlistBottomSheet(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Confirm button
         Button(
             onClick = {
                 if (selectedFolderIds.isNotEmpty()) {

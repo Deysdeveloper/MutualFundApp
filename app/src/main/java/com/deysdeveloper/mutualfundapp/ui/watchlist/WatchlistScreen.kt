@@ -46,8 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.deysdeveloper.mutualfundapp.data.local.entity.WatchlistFolder
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WatchlistScreen(
@@ -92,7 +90,6 @@ fun WatchlistScreen(
         }
     }
 
-    // ── Delete confirmation dialog ────────────────────────────────────────────
     folderToDelete?.let { folder ->
         AlertDialog(
             onDismissRequest = { folderToDelete = null },
@@ -121,7 +118,6 @@ fun WatchlistScreen(
         )
     }
 
-    // ── Create folder bottom sheet ────────────────────────────────────────────
     if (showCreateSheet) {
         ModalBottomSheet(
             onDismissRequest = { showCreateSheet = false },
@@ -137,8 +133,6 @@ fun WatchlistScreen(
         }
     }
 }
-
-// ─── Folder list ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun FolderList(
@@ -199,8 +193,6 @@ private fun FolderItem(
     }
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
 @Composable
 private fun WatchlistEmptyState(modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -224,8 +216,6 @@ private fun WatchlistEmptyState(modifier: Modifier = Modifier) {
         )
     }
 }
-
-// ─── Create folder sheet ──────────────────────────────────────────────────────
 
 @Composable
 private fun CreateFolderSheet(

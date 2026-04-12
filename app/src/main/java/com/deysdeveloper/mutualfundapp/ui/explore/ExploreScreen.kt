@@ -48,19 +48,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.deysdeveloper.mutualfundapp.domain.model.Fund
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 private const val MAX_CARDS_PER_CATEGORY = 4
 
-/** One gradient per category, cycling if more categories than entries. */
+// Gradients cycle if there are more categories than entries
 private val categoryGradients = listOf(
-    listOf(Color(0xFF1565C0), Color(0xFF42A5F5)),   // Blue
-    listOf(Color(0xFF2E7D32), Color(0xFF66BB6A)),   // Green
-    listOf(Color(0xFF6A1B9A), Color(0xFFAB47BC)),   // Purple
-    listOf(Color(0xFFBF360C), Color(0xFFFFA726)),   // Orange-amber
+    listOf(Color(0xFF1565C0), Color(0xFF42A5F5)),
+    listOf(Color(0xFF2E7D32), Color(0xFF66BB6A)),
+    listOf(Color(0xFF6A1B9A), Color(0xFFAB47BC)),
+    listOf(Color(0xFFBF360C), Color(0xFFFFA726)),
 )
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 @Composable
 fun ExploreScreen(
@@ -93,8 +89,6 @@ fun ExploreScreen(
     }
 }
 
-// ─── Header ───────────────────────────────────────────────────────────────────
-
 @Composable
 private fun ExploreHeader(onSearchClick: () -> Unit) {
     Box(
@@ -123,7 +117,6 @@ private fun ExploreHeader(onSearchClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Clickable search pill
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,8 +147,6 @@ private fun ExploreHeader(onSearchClick: () -> Unit) {
     }
 }
 
-// ─── Content ──────────────────────────────────────────────────────────────────
-
 @Composable
 private fun ExploreContent(
     categories: Map<String, List<Fund>>,
@@ -178,8 +169,6 @@ private fun ExploreContent(
     }
 }
 
-// ─── Category section ─────────────────────────────────────────────────────────
-
 @Composable
 private fun CategorySection(
     title: String,
@@ -191,7 +180,6 @@ private fun CategorySection(
     val gradient = categoryGradients[colorIndex]
 
     Column(modifier = Modifier.padding(top = 24.dp)) {
-        // Section header row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -200,7 +188,6 @@ private fun CategorySection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Colored accent bar
                 Box(
                     modifier = Modifier
                         .size(width = 4.dp, height = 22.dp)
@@ -249,8 +236,6 @@ private fun CategorySection(
     }
 }
 
-// ─── Fund card ────────────────────────────────────────────────────────────────
-
 @Composable
 private fun FundCard(
     fund: Fund,
@@ -266,7 +251,6 @@ private fun FundCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column {
-            // Top gradient strip
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -274,7 +258,6 @@ private fun FundCard(
                     .background(Brush.horizontalGradient(gradient))
             )
             Column(modifier = Modifier.padding(14.dp)) {
-                // Icon badge
                 Box(
                     modifier = Modifier
                         .size(38.dp)
@@ -303,7 +286,6 @@ private fun FundCard(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Scheme code badge
                 Surface(
                     shape = RoundedCornerShape(5.dp),
                     color = gradient[0].copy(alpha = 0.10f)
@@ -320,8 +302,6 @@ private fun FundCard(
         }
     }
 }
-
-// ─── Loading / Error states ───────────────────────────────────────────────────
 
 @Composable
 private fun ExploreLoadingState() {

@@ -15,38 +15,23 @@ class FundRepository(
     private val cachedFundDao: CachedFundDao
 ) {
 
-    /**
-     * Search for mutual funds matching [query].
-     * Used by SearchViewModel — results are ephemeral and not cached.
-     */
     suspend fun searchFunds(query: String): List<Fund> =
         apiService.searchFunds(query)
 
-    /**
-     * Fetch detailed NAV history for the fund identified by [schemeCode].
-     */
     suspend fun getFundDetails(schemeCode: String): FundDetailsResponse =
         apiService.getFundDetails(schemeCode)
 
     /**
-     * Offline-first fund list for the Explore screen.
-     *
-     * Behaviour:
-     * 1. Starts collecting Room's reactive flow — any existing cache is emitted immediately.
-     * 2. In parallel, fetches a fresh batch from the API, replaces the cached rows, and
-     *    lets Room's Flow auto-notify the collector with updated data.
-     * 3. If the network call fails the exception is silently swallowed; the cached
-     *    emission already visible in the UI remains intact.
+     * Offline-first: emits cached data immediately, then refreshes from network in the background.
+     * If the network call fails, the cached data already in the UI remains intact.
      */
     fun getFundsByCategory(category: String): Flow<List<Fund>> = channelFlow {
-        // Step 1 — start streaming cached data from Room (emits immediately if cache exists)
         launch {
             cachedFundDao.getFundsByCategory(category)
                 .map { list -> list.map { it.toFund() } }
                 .collect { send(it) }
         }
 
-        // Step 2 — refresh from network in the background
         try {
             val fresh = apiService.searchFunds(category)
             val entities = fresh.map { fund ->
@@ -54,19 +39,15 @@ class FundRepository(
                     category = category,
                     schemeCode = fund.schemeCode.toString(),
                     fundName = fund.schemeName,
-                    nav = "" // NAV not returned by search endpoint
+                    nav = "" // NAV not returned by the search endpoint
                 )
             }
-            // Replace stale cache then insert fresh batch
             cachedFundDao.deleteFundsByCategory(category)
             cachedFundDao.insertFunds(entities)
-            // Room's reactive Flow will re-emit the updated list automatically
         } catch (_: Exception) {
-            // Network unavailable — cached data already flowing; nothing extra to do
+            // Network unavailable — cached data is still flowing
         }
     }
-
-    // ─── Private helpers ──────────────────────────────────────────────────────
 
     private fun CachedFund.toFund(): Fund = Fund(
         schemeCode = schemeCode.toIntOrNull() ?: 0,
