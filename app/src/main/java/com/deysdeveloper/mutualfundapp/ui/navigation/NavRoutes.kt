@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
  * Type-safe navigation route keys for Navigation 3.
  * Each subtype is @Serializable so Nav3 can save/restore the back stack.
  */
-@Serializable
 sealed interface Route : NavKey {
 
     @Serializable

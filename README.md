@@ -26,7 +26,7 @@ Composables  ←→   StateFlow /      ←→   FundRepository    ←→   Retro
                   classes
 ```
 
-### Layer breakdown
+#### Layer breakdown
 
 | Layer | Responsibility |
 |---|---|
