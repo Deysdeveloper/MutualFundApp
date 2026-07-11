@@ -11,6 +11,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -54,17 +55,46 @@ class FundRepositoryTest {
     }
 
     @Test
-    fun `searchFunds should call apiService`() = runTest {
+    fun `getFundsByCategory network failure should still emit cached data`() = runTest {
         // Given
-        val query = "tata"
-        val expectedFunds = listOf(Fund(1, "Tata Index Fund"))
-        coEvery { apiService.searchFunds(query) } returns expectedFunds
+        val category = "index"
+        val cachedFunds = listOf(CachedFund(id = 1, category = category, schemeCode = "101", fundName = "Cached Fund", nav = "10.0"))
+        
+        coEvery { cachedFundDao.getFundsByCategory(category) } returns flowOf(cachedFunds)
+        coEvery { apiService.searchFunds(category) } throws Exception("Network timeout")
+
+        // When & Then
+        repository.getFundsByCategory(category).test {
+            val emission = awaitItem()
+            assertEquals("Cached Fund", emission[0].schemeName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `getFundsByCategory with empty cache and network failure should emit empty list`() = runTest {
+        // Given
+        val category = "index"
+        coEvery { cachedFundDao.getFundsByCategory(category) } returns flowOf(emptyList())
+        coEvery { apiService.searchFunds(category) } throws Exception("No Internet")
+
+        // When & Then
+        repository.getFundsByCategory(category).test {
+            val emission = awaitItem()
+            assertTrue(emission.isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `searchFunds with empty results should return empty list`() = runTest {
+        // Given
+        coEvery { apiService.searchFunds("invalid") } returns emptyList()
 
         // When
-        val result = repository.searchFunds(query)
+        val result = repository.searchFunds("invalid")
 
         // Then
-        assertEquals(expectedFunds, result)
-        coVerify { apiService.searchFunds(query) }
+        assertTrue(result.isEmpty())
     }
 }

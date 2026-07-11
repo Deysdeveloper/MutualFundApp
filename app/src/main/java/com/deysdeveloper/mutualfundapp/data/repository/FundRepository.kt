@@ -34,16 +34,18 @@ class FundRepository(
 
         try {
             val fresh = apiService.searchFunds(category)
-            val entities = fresh.map { fund ->
-                CachedFund(
-                    category = category,
-                    schemeCode = fund.schemeCode.toString(),
-                    fundName = fund.schemeName,
-                    nav = "" // NAV not returned by the search endpoint
-                )
+            if (fresh.isNotEmpty()) {
+                val entities = fresh.map { fund ->
+                    CachedFund(
+                        category = category,
+                        schemeCode = fund.schemeCode.toString(),
+                        fundName = fund.schemeName,
+                        nav = "" // NAV not returned by the search endpoint
+                    )
+                }
+                cachedFundDao.deleteFundsByCategory(category)
+                cachedFundDao.insertFunds(entities)
             }
-            cachedFundDao.deleteFundsByCategory(category)
-            cachedFundDao.insertFunds(entities)
         } catch (_: Exception) {
             // Network unavailable — cached data is still flowing
         }

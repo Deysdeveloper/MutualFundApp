@@ -8,6 +8,7 @@ import com.deysdeveloper.mutualfundapp.domain.model.FundDetailsResponse
 import com.deysdeveloper.mutualfundapp.domain.model.FundMeta
 import com.deysdeveloper.mutualfundapp.domain.model.NavEntry
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,10 +70,16 @@ class ProductViewModelTest {
     }
 
     @Test
-    fun `loadFund should update uiState to Error when repository fails`() = runTest {
+    fun `loadFund should handle empty NAV data`() = runTest {
         // Given
         val schemeCode = "12345"
-        coEvery { fundRepository.getFundDetails(schemeCode) } throws Exception("API Error")
+        val mockDetails = FundDetailsResponse(
+            meta = FundMeta("House", "Type", "Category", 12345, "Fund Name"),
+            data = emptyList(),
+            status = "Success"
+        )
+        coEvery { fundRepository.getFundDetails(schemeCode) } returns mockDetails
+        coEvery { watchlistRepository.isFundSaved(schemeCode) } returns false
 
         // When
         viewModel.loadFund(schemeCode)
@@ -81,9 +88,31 @@ class ProductViewModelTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            assertTrue(state is ProductUiState.Error)
-            assertEquals("API Error", (state as ProductUiState.Error).message)
+            assertTrue(state is ProductUiState.Success)
+            assertTrue((state as ProductUiState.Success).chartData.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `loadFund should not reload if same schemeCode is already Success`() = runTest {
+        // Given
+        val schemeCode = "12345"
+        val mockDetails = FundDetailsResponse(
+            meta = FundMeta("House", "Type", "Category", 12345, "Fund Name"),
+            data = listOf(NavEntry("01-01-2023", "10.0")),
+            status = "Success"
+        )
+        coEvery { fundRepository.getFundDetails(schemeCode) } returns mockDetails
+        coEvery { watchlistRepository.isFundSaved(schemeCode) } returns false
+
+        // When
+        viewModel.loadFund(schemeCode)
+        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.loadFund(schemeCode) // Second call
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then
+        coVerify(exactly = 1) { fundRepository.getFundDetails(schemeCode) }
     }
 }

@@ -33,6 +33,30 @@ object NetworkModule {
     ): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("User-Agent", "MutualFundApp/1.0")
+                    .build()
+                
+                var response: okhttp3.Response? = null
+                var error: Exception? = null
+                
+                // Retry up to 3 times with a small delay
+                for (i in 1..3) {
+                    try {
+                        response = chain.proceed(request)
+                        if (response.isSuccessful) return@addInterceptor response
+                    } catch (e: Exception) {
+                        error = e
+                    }
+                    
+                    if (i < 3) {
+                        Thread.sleep(1000L * i) // Exponential backoff (1s, 2s)
+                    }
+                }
+                
+                response ?: throw error ?: Exception("Unknown network error")
+            }
             .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
